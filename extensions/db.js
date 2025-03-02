@@ -1,6 +1,12 @@
-class Database {
+import sqlite3 from "sqlite3";
+
+const verboseSqlite3 = sqlite3.verbose();
+
+export default class Database {
   constructor(dbName) {
-    this.sqlite3 = require("sqlite3").verbose();
+    // this.sqlite3 = require("sqlite3").verbose();
+    // this.dbName = dbName;
+    this.sqlite3 = verboseSqlite3;
     this.dbName = dbName;
   }
   connectToDb() {
@@ -12,10 +18,20 @@ class Database {
     });
   }
 
-  addDataToDb(tableName, data) {
+  addDataToDb(tableName, name, email) {
     this.db.serialize(() => {
-      const stmt = this.db.prepare(`INSERT INTO ${tableName} VALUES (?)`);
-      stmt.run(data);
+      const stmt = this.db.prepare(
+        `INSERT INTO ${tableName} (name, email) VALUES (?, ?)`
+      );
+      // stmt.run(data);
+      stmt.run(name, email, (err) => {
+        if (err) {
+          console.error("Error inserting data:", err);
+        } else {
+          console.log("Data inserted successfully");
+        }
+      });
+      stmt.finalize();
     });
   }
 
@@ -28,9 +44,9 @@ class Database {
   }
 }
 
-var db = new Database("test.db");
-db.connectToDb();
-db.createTable("ilsu", "(test TEXT)");
-db.addDataToDb("ilsu", "testtext");
+// var db = new Database("test.db");
+// db.connectToDb();
+// db.createTable("ilsu", "(test TEXT)");
+// db.addDataToDb("ilsu", "testtext");
 
-db.readTable("ilsu");
+// db.readTable("ilsu");
